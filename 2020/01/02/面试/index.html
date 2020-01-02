@@ -19,7 +19,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://yoursite.com/gallery/thumbnails/java%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9B%AE(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0).jpeg">
 <meta property="article:published_time" content="2020-01-02T09:40:40.000Z">
-<meta property="article:modified_time" content="2020-01-02T13:04:58.000Z">
+<meta property="article:modified_time" content="2020-01-02T13:12:55.000Z">
 <meta property="article:author" content="ACtangle">
 <meta property="article:tag" content="java">
 <meta name="twitter:card" content="summary">
@@ -356,9 +356,8 @@ NewScheduledThreadPool:
 </li>
 <li><p>丢失修改：1.A事务撤销时，把已经提交的B事务的更新数据覆盖了<br><img src="/articalPic/8.jpg" alt="avatar"></p>
 </li>
-</ul>
-<p>2.A事务覆盖B事务已经提交的数据，造成B事务所做操作丢失<br><img src="/articalPic/9.jpg" alt="avatar"></p>
-<ul>
+<li><p>A事务覆盖B事务已经提交的数据，造成B事务所做操作丢失<br><img src="/articalPic/9.jpg" alt="avatar"></p>
+</li>
 <li><p>不可重复读：发生在读取了已提交事务的数据，比如A事务第一次读数据时为1000，但是这时候B事务已经修改为900并且提交事务，而A第二次读该数据的时候发现了数据不一致，这就是不可重复读。<br><img src="/articalPic/10.jpg" alt="avatar"></p>
 </li>
 <li><p>幻读：发生在A读取B提交事务新增的数据时，比如A事务第一次读取数据为一条数据，但是这时候B事务已经新增数据且提交事务，而A第二次读了数据不明白造成幻读现象。<br><img src="/articalPic/11.jpg" alt="avatar"></p>
