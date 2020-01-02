@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html  lang="zh">
+<head>
+    <meta charset="utf-8" />
+
+<meta name="generator" content="Hexo 4.2.0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>线程之synchronized详解 - Melon&#39;blog</title>
+
+
+    <meta name="description" content="出处：https:&#x2F;&#x2F;www.imooc.com&#x2F;learn&#x2F;1086注意：笔记只对作者有用，不能保证可靠性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程之synchronized详解">
+<meta property="og:url" content="http://yoursite.com/2020/01/02/%E7%BA%BF%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Melon&#39;blog">
+<meta property="og:description" content="出处：https:&#x2F;&#x2F;www.imooc.com&#x2F;learn&#x2F;1086注意：笔记只对作者有用，不能保证可靠性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/gallery/thumbnails/%E7%BA%BF%E7%A8%8B%E4%B9%8Bsynchronized%E8%AF%A6%E8%A7%A3.jpg">
+<meta property="article:published_time" content="2020-01-02T09:40:47.000Z">
+<meta property="article:modified_time" content="2020-01-02T11:49:27.000Z">
+<meta property="article:author" content="ACtangle">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/gallery/thumbnails/%E7%BA%BF%E7%A8%8B%E4%B9%8Bsynchronized%E8%AF%A6%E8%A7%A3.jpg">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon1.jpg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+<style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+
+    
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+
+    
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+    
+    
+    
+    
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+    
+    
+    
+    
+    
+    
+    
+    <link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/favicon1.jpg" alt="线程之synchronized详解" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item"
+                href="/">首页</a>
+                
+                <a class="navbar-item"
+                href="/archives">归档</a>
+                
+                <a class="navbar-item"
+                href="/categories">分类</a>
+                
+                <a class="navbar-item"
+                href="/tags">标签</a>
+                
+                <a class="navbar-item"
+                href="/about">关于我</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    <a class="navbar-item" target="_blank" rel="noopener" title="My GitHub" href="https://github.com/ACtangle">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                <a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;">
+                    <i class="fas fa-list-ul"></i>
+                </a>
+                
+                
+                <a class="navbar-item search" title="搜索" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main">
+<div class="card">
+    
+    <div class="card-image">
+        <span  class="image is-7by1">
+            <img class="thumbnail" src="/gallery/thumbnails/%E7%BA%BF%E7%A8%8B%E4%B9%8Bsynchronized%E8%AF%A6%E8%A7%A3.jpg" alt="线程之synchronized详解">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2020-01-02T09:40:47.000Z">2020-01-02</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    14 分钟 读完 (大约 2032 个字)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                线程之synchronized详解
+            
+        </h1>
+        <div class="content">
+            <h4 id="出处：https-www-imooc-com-learn-1086"><a href="#出处：https-www-imooc-com-learn-1086" class="headerlink" title="出处：https://www.imooc.com/learn/1086"></a>出处：<a href="https://www.imooc.com/learn/1086">https://www.imooc.com/learn/1086</a></h4><h4 id="注意：笔记只对作者有用，不能保证可靠性"><a href="#注意：笔记只对作者有用，不能保证可靠性" class="headerlink" title="注意：笔记只对作者有用，不能保证可靠性"></a>注意：笔记只对作者有用，不能保证可靠性</h4><a id="more"></a>
+<ul>
+<li>1.互斥与同步的理解<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">线程互斥：多个线程竞争同一个锁条件</span><br><span class="line">同步：指线程与线程之间的一种通信交互方式，一端发送消息、另一端响应消息</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>2.wait、notify、notifyAll的使用与理解<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">场景：多个线程在共享区域（临界区）抢占共享资源,获得锁才能进入临界区拿到对应的共享资源</span><br><span class="line">共同点：都是实例的方法</span><br><span class="line">wait：当前线程获取到锁对象，但是当前线程不满足某个条件时，就会释放当前占有的锁对象，最后当前线程放置于锁对象（记住是锁对象）中的wait set区域（等锁池），其他线程仍旧可以抢这个锁对象</span><br><span class="line">notify与notifyAll：当其他线程已经抢占到锁对象并且执行完当前线程的某些操作，后使用notify和notifyAll唤醒锁对象中wait set区域内的单个或多个等待线程可以重新抢占锁对象</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>3.停止线程的方法stop(),interrupt()的使用注意事项。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1、基本放弃stop方法，容易导致死锁</span><br><span class="line">2、interrupt方法可以用来请求线程终止，interupt实际是改变线程的某种状态（返回值是boolean值），如果线程被阻塞，就无法检测中断状态（在有join、sleep等方法操作的时候，造成Interrupted Exception异常中断）</span><br><span class="line">3、如果需要真正切实可行的终结线程，一般采用一个boolean值在作为线程终结的标志来动态控制线程的结束</span><br><span class="line">扩展：interrupted为静态方法，不同于interrupt方法，它是测试当前线程是否被终中断，副作用——将当前线程的中断状态置位false。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>4.join（）、yield（）、sleep（）的区别<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">join：实例方法，其他线程需等待当前线程终止后（类似VIP插队）</span><br><span class="line">yeild：Thread的静态方法，指当前线程让出处理器资源，其他线程包括当前线程重新竞争临界区（只会让给相同优先级或更高优先级的线程）</span><br><span class="line">sleep：Thread的静态方法，线程休眠，但是不会释放对象锁（让给低优先级的线程）</span><br><span class="line">扩展：sleep（）方法比yield（）方法更具有可移植性</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>5.线程六种状态。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">New（新创建）、Runnable（可运行）、Blocked（被阻塞）、Waiting（等待）、Timed Waiting（计时等待）、Terminated（被终止）</span><br><span class="line">~New：出一个新线程的时候的状态</span><br><span class="line">~Runnable：调用start方法时，线程处于可运行状态，此时可运行的线程可能正在运行也可能没运行。一个线程只有在调用yield方法、或者被阻塞或等待时，线程才失去控制权</span><br><span class="line">~Blocked：</span><br><span class="line">    1、当一个线程试图获取一个内部的对象锁时，但是此对象锁被其他线程持有，该线程进入阻塞状态。</span><br><span class="line">    2、当线程等待另一个线程通知调度器一个条件时，它自己就会进入等待状态，比如使用Object的wait方法或者Thread的join方法，或者是等待java.util.concurrent中的Lock或者Condition时，就会出现这种情况（等待状态）</span><br><span class="line">    3、有几个方法有一个超时参数。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>6.对象锁和类锁</li>
+</ul>
+<p>1.对象锁：对象锁指的是多个线程使用同一个实例(两种形式：代码块形式和方法形式)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">synchronized (this) &#123;</span><br><span class="line">           ···</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">此处形式实际上隐形的使用了this这个实例</span><br><span class="line">public synchronized void method()&#123;</span><br><span class="line">           ···</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>2.类锁：类锁指的是多个线程使用类的Class对象（唯一一个对象）（两种形式：静态方法）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static synchronized void method()&#123;</span><br><span class="line">           ···</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">synchronized (Abc.class) &#123;</span><br><span class="line">           ···</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>注：类锁一般用于全局的情况下</p>
+<hr>
+<ul>
+<li>7.synchronized有哪些特性，分别是什么？<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">可重入性：同一线程的外层函数获得锁以后，内层函数可以直接获取该锁，比如synchronized关键字（本质是由jvm跟踪对象锁加锁的次数，含有一个计时器）</span><br><span class="line">假设synchronized不可重入，当有两个synchronized方法的前提下，同一线程在第一个方法（已获取锁对象）调用第二同步方法时，这个时候，当前方法持有锁，而第二个方法未持有锁，即会造成死锁情况。</span><br><span class="line">不可中断性：锁一旦被占用就无法主动打断持有锁的线程，只能等待锁释放（不同于Lock类，Lock类具有中断和退出性质）</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<ul>
+<li>8.synchronized有哪些缺陷？</li>
+</ul>
+<p>1.效率低：未持有锁的其他线程必须等待锁释放才能去获取临界资源，造成效率低<br>2.不够灵活（读写锁更灵活）：加锁和释放锁的时机单一，每个锁仅有单一的条件（对象），可能是不够的<br>3.无法知道是否成功获取锁<br>注意：以上可以当成Lock的相对缺陷，lock更灵活些是因为lock接口的某些方法，比如设置尝试获取锁trylock和它的参数设置超时时间以及它手动的lock加锁和unlock解锁操作；读写锁更灵活是因为读操作的时候可以不需要锁，写锁由于需要同步数据，所以必须要加入锁机制；掌握lock和synchronized的区别可以更细节的去根据业务场景进行选择</p>
+<hr>
+<h3 id="常问面试题"><a href="#常问面试题" class="headerlink" title="常问面试题"></a>常问面试题</h3><ul>
+<li><p>使用synchronized的注意事项？<br>1、锁对象不能为空（因为锁对象都是在对象里面的，可以参考javap -verpose反编译.class文件展开说monitorenter指令和monitorexit指令）<br>2、作用域不宜过大<br>3、避免死锁</p>
+</li>
+<li><p>如何选择synchronized关键字和Lock接口？<br>1、如果都满足业务需求，可以使用前者，因为代码量少避免出错<br>2、如果需要更灵活利用特性，比如lock的更为手动的灵活控制，就使用lock<br>3、如果有现成的已经实现现成安全的类则优先使用</p>
+</li>
+<li><p>多线程访问同步方法的各种情况<br>1、两个线程同时访问一个对象的同步方法 —— 同步串行（对象锁）<br>2、两个线程同时访问两个对象的同步方法 —— 并行（不同的对象锁）<br>3、两个线程访问的是synchronized静态方法 —— 同步串行（类锁）<br>4、同时访问同步方法和非同步方法 —— 非同步方法不会受到干扰<br>5、访问同一个对象的不同的普通同步方法 —— 同步（因为实际上的对象锁还是this当前实例）<br>6、同时访问静态synchronized和非静态synchroinzed方法 —— 并行（因为静态的同步方法访问类实例，而非静态同步方法访问的是类的Class对象，两个实例不一样，所以不存在竞争，即并行）<br>7、方法抛出异常，会释放锁 —— synchorinzed遇到异常会自动释放锁，而Lock需要trycatch后手动释放锁<br>8、如果多个线程去访问一个被synchronized关键字的方法（这个方法会去调用非synchronized的方法），此时线程是不安全的，因为当调用的方法脱离了synchronized之后，就脱离了该关键字的范围</p>
+</li>
+</ul>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/java/" rel="tag">java</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="social-share"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css">
+<script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3>
+        <div class="buttons is-centered">
+            
+                
+<a class="button is-info donate">
+    <span class="icon is-small">
+        <i class="fab fa-alipay"></i>
+    </span>
+    <span>支付宝</span>
+    <div class="qrcode"><img src="/images/Alipay.jpeg" alt="支付宝"></div>
+</a>
+
+                
+                
+<a class="button is-success donate">
+    <span class="icon is-small">
+        <i class="fab fa-weixin"></i>
+    </span>
+    <span>微信</span>
+    <div class="qrcode"><img src="/images/WechatPay.jpeg" alt="微信"></div>
+</a>
+
+                
+        </div>
+    </div>
+</div>
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        <div class="level-start">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2020/01/02/redis/">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item">redis之锁相关知识和场景</span>
+            </a>
+        </div>
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2020/01/02/%E9%9D%A2%E8%AF%95/">
+                <span class="level-item">java面试题目 -- 持续更新</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">评论</h3>
+        
+<div id="valine-thread" class="content"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#valine-thread' ,
+        notify: false,
+        verify: false,
+        app_id: 'M5j8Bdd7E5kaRFkdSK036Jp7-gzGzoHsz',
+        app_key: 'DGzozLkqX4ABAOrTMYHqzutb',
+        placeholder: '文明留言，营造新素质社会'
+    });
+</script>
+
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered" style="flex-shrink: 1">
+                <div>
+                    
+                    <figure class="image is-128x128 has-mb-6">
+                        <img class="" src="/images/melon.jpg" alt="Melon">
+                    </figure>
+                    
+                    <p class="is-size-4 is-block">
+                        Melon
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        Programmer
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>China,Guangdong</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        文章
+                    </p>
+                    <a href="/archives">
+                        <p class="title has-text-weight-normal">
+                            6
+                        </p>
+                    </a>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        分类
+                    </p>
+                    <a href="/categories">
+                        <p class="title has-text-weight-normal">
+                            2
+                        </p>
+                    </a>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        标签
+                    </p>
+                    <a href="/tags">
+                        <p class="title has-text-weight-normal">
+                            4
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="https://github.com/ACtangle" target="_blank" rel="noopener">
+                关注我</a>
+        </div>
+        
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank" rel="noopener"
+                title="Github" href="https://github.com/">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" rel="noopener"
+                title="Facebook" href="https://facebook.com">
+                
+                <i class="fab fa-facebook"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" rel="noopener"
+                title="Twitter" href="https://twitter.com">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" rel="noopener"
+                title="Dribbble" href="https://dribbble.com">
+                
+                <i class="fab fa-dribbble"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" rel="noopener"
+                title="RSS" href="/">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+
+    <div class="card widget" id="toc">
+        <div class="card-content">
+            <div class="menu">
+                <h3 class="menu-label">
+                    目录
+                </h3>
+                <ul class="menu-list"><ul class="menu-list"><li>
+        <a class="is-flex" href="#出处：https-www-imooc-com-learn-1086">
+        <span class="has-mr-6">1.1</span>
+        <span>出处：https://www.imooc.com/learn/1086</span>
+        </a></li><li>
+        <a class="is-flex" href="#注意：笔记只对作者有用，不能保证可靠性">
+        <span class="has-mr-6">1.2</span>
+        <span>注意：笔记只对作者有用，不能保证可靠性</span>
+        </a></li></ul><li>
+        <a class="is-flex" href="#常问面试题">
+        <span class="has-mr-6">2</span>
+        <span>常问面试题</span>
+        </a></li></ul>
+            </div>
+        </div>
+    </div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            链接
+        </h3>
+        <ul class="menu-list">
+        
+            <li>
+                <a class="level is-mobile" href="https://www.zhihu.com/people/lu-yong-jia-40/activities" target="_blank" rel="noopener">
+                    <span class="level-left">
+                        <span class="level-item">知乎</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">www.zhihu.com</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://weibo.com/5333102318/profile?rightmod=1&wvr=6&mod=personinfo" target="_blank" rel="noopener">
+                    <span class="level-left">
+                        <span class="level-item">微博</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">weibo.com</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://juejin.im/user/5c24bdece51d4570c053d80b" target="_blank" rel="noopener">
+                    <span class="level-left">
+                        <span class="level-item">掘金</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">juejin.im</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://github.com/ACtangle" target="_blank" rel="noopener">
+                    <span class="level-left">
+                        <span class="level-item">Github</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">github.com</span>
+                    </span>
+                </a>
+            </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                分类
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/%E7%AC%94%E8%AE%B0/">
+            <span class="level-start">
+                <span class="level-item">笔记</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">5</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/%E9%9D%A2%E8%AF%95/">
+            <span class="level-start">
+                <span class="level-item">面试</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            标签云
+        </h3>
+        <a href="/tags/java/" style="font-size: 20px;">java</a> <a href="/tags/redis/" style="font-size: 10px;">redis</a> <a href="/tags/spring/" style="font-size: 10px;">spring</a> <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">计算机网络</a>
+    </div>
+</div>
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen ">
+        
+            <div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/spring%E4%BA%8B%E5%8A%A1/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/spring%E4%BA%8B%E5%8A%A1.jpg" alt="spring事务基础认识和配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:41:02.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/spring%E4%BA%8B%E5%8A%A1/" class="title has-link-black-ter is-size-6 has-text-weight-normal">spring事务基础认识和配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/redis/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/redis%E4%B9%8B%E9%94%81%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86.png" alt="redis之锁相关知识和场景">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:56.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/redis/" class="title has-link-black-ter is-size-6 has-text-weight-normal">redis之锁相关知识和场景</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E7%BA%BF%E7%A8%8B/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/%E7%BA%BF%E7%A8%8B%E4%B9%8Bsynchronized%E8%AF%A6%E8%A7%A3.jpg" alt="线程之synchronized详解">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:47.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E7%BA%BF%E7%A8%8B/" class="title has-link-black-ter is-size-6 has-text-weight-normal">线程之synchronized详解</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E9%9D%A2%E8%AF%95/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/java%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9B%AE(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0).jpeg" alt="java面试题目 -- 持续更新">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:40.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E9%9D%A2%E8%AF%95/" class="title has-link-black-ter is-size-6 has-text-weight-normal">java面试题目 -- 持续更新</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E9%9D%A2%E8%AF%95/">面试</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E5%8F%8D%E5%B0%84/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/%E5%8F%8D%E5%B0%84%E4%B9%8B%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8.jpg" alt="反射之基础使用">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:33.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E5%8F%8D%E5%B0%84/" class="title has-link-black-ter is-size-6 has-text-weight-normal">反射之基础使用</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">6</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/java/">
+                        <span class="tag">java</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/redis/">
+                        <span class="tag">redis</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/spring/">
+                        <span class="tag">spring</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">
+                        <span class="tag">计算机网络</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right ">
+    
+        <div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/spring%E4%BA%8B%E5%8A%A1/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/spring%E4%BA%8B%E5%8A%A1.jpg" alt="spring事务基础认识和配置">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:41:02.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/spring%E4%BA%8B%E5%8A%A1/" class="title has-link-black-ter is-size-6 has-text-weight-normal">spring事务基础认识和配置</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/redis/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/redis%E4%B9%8B%E9%94%81%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86.png" alt="redis之锁相关知识和场景">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:56.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/redis/" class="title has-link-black-ter is-size-6 has-text-weight-normal">redis之锁相关知识和场景</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E7%BA%BF%E7%A8%8B/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/%E7%BA%BF%E7%A8%8B%E4%B9%8Bsynchronized%E8%AF%A6%E8%A7%A3.jpg" alt="线程之synchronized详解">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:47.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E7%BA%BF%E7%A8%8B/" class="title has-link-black-ter is-size-6 has-text-weight-normal">线程之synchronized详解</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E9%9D%A2%E8%AF%95/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/java%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9B%AE(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0).jpeg" alt="java面试题目 -- 持续更新">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:40.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E9%9D%A2%E8%AF%95/" class="title has-link-black-ter is-size-6 has-text-weight-normal">java面试题目 -- 持续更新</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E9%9D%A2%E8%AF%95/">面试</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2020/01/02/%E5%8F%8D%E5%B0%84/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/gallery/thumbnails/%E5%8F%8D%E5%B0%84%E4%B9%8B%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8.jpg" alt="反射之基础使用">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2020-01-02T09:40:33.000Z">2020-01-02</time></div>
+                    <a href="/2020/01/02/%E5%8F%8D%E5%B0%84/" class="title has-link-black-ter is-size-6 has-text-weight-normal">反射之基础使用</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2020/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2020</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">6</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/java/">
+                        <span class="tag">java</span>
+                        <span class="tag is-grey">3</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/redis/">
+                        <span class="tag">redis</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/spring/">
+                        <span class="tag">spring</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">
+                        <span class="tag">计算机网络</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/favicon1.jpg" alt="线程之synchronized详解" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2020 ACtangle&nbsp;
+                Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> & <a
+                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+        <span id="busuanzi_container_site_pv" class="theme-info">
+            |  本站总访问量<span id="busuanzi_value_site_pv"></span>次
+           </span>
+           <span id="busuanzi_container_site_uv" class="theme-info">
+            |  本站访客数<span id="busuanzi_value_site_uv"></span>人次
+           </span>
+          
+          <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    </div>
+</footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("zh-CN");</script>
+
+
+<script>
+var IcarusThemeSettings = {
+    site: {
+        url: 'http://yoursite.com',
+        external_link: {"enable":true,"exclude":[]}
+    },
+    article: {
+        highlight: {
+            clipboard: true,
+            fold: 'unfolded'
+        }
+    }
+};
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+
+
+
+
+
+<script src="/js/animation.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+<script src="/js/gallery.js" defer></script>
+
+
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+
+<a id="back-to-top" title="回到顶端" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: '文章',
+                PAGES: '页面',
+                CATEGORIES: '分类',
+                TAGS: '标签',
+                UNTITLED: '(无标题)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
