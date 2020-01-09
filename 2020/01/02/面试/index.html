@@ -10,16 +10,16 @@
 <title>java面试题目 -- 持续更新 - Melon&#39;blog</title>
 
 
-    <meta name="description" content="注意：笔记只对作者有用，不能保证可靠性请简述SpringMVC的工作流程?">
+    <meta name="description" content="注意：笔记只对作者有用，不能保证可靠性">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java面试题目 -- 持续更新">
 <meta property="og:url" content="http://yoursite.com/2020/01/02/%E9%9D%A2%E8%AF%95/index.html">
 <meta property="og:site_name" content="Melon&#39;blog">
-<meta property="og:description" content="注意：笔记只对作者有用，不能保证可靠性请简述SpringMVC的工作流程?">
+<meta property="og:description" content="注意：笔记只对作者有用，不能保证可靠性">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://yoursite.com/gallery/thumbnails/java%E9%9D%A2%E8%AF%95%E9%A2%98%E7%9B%AE(%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0).jpeg">
 <meta property="article:published_time" content="2020-01-02T09:40:40.000Z">
-<meta property="article:modified_time" content="2020-01-09T12:02:50.000Z">
+<meta property="article:modified_time" content="2020-01-09T12:04:01.000Z">
 <meta property="article:author" content="ACtangle">
 <meta property="article:tag" content="java">
 <meta name="twitter:card" content="summary">
@@ -170,8 +170,8 @@
             
         </h1>
         <div class="content">
-            <h4 id="注意：笔记只对作者有用，不能保证可靠性"><a href="#注意：笔记只对作者有用，不能保证可靠性" class="headerlink" title="注意：笔记只对作者有用，不能保证可靠性"></a>注意：笔记只对作者有用，不能保证可靠性</h4><h4 id="请简述SpringMVC的工作流程"><a href="#请简述SpringMVC的工作流程" class="headerlink" title="请简述SpringMVC的工作流程?"></a><strong><em>请简述SpringMVC的工作流程?</em></strong></h4><a id="more"></a>
-<p><img src="/articalPic/19.png" alt="avatar"></p>
+            <h4 id="注意：笔记只对作者有用，不能保证可靠性"><a href="#注意：笔记只对作者有用，不能保证可靠性" class="headerlink" title="注意：笔记只对作者有用，不能保证可靠性"></a>注意：笔记只对作者有用，不能保证可靠性</h4><a id="more"></a>
+<h4 id="请简述SpringMVC的工作流程"><a href="#请简述SpringMVC的工作流程" class="headerlink" title="请简述SpringMVC的工作流程?"></a><strong><em>请简述SpringMVC的工作流程?</em></strong></h4><p><img src="/articalPic/19.png" alt="avatar"></p>
 <ul>
 <li>用户发起请求到前端控制器（DispatcherServlet），该控制器会过滤出哪些请求可以访问Servlet、哪些不能访问。就是url-pattern的作用，并且会加载springmvc.xml配置文件。</li>
 <li>前端控制器会找到处理器映射器（HandlerMapping），通过HandlerMapping完成url到controller映射的组件，简单来说，就是将在springmvc.xml中配置的或者注解的url与对应的处理类找到并进行存储，用map&lt;url,handler&gt;这样的方式来存储。</li>
