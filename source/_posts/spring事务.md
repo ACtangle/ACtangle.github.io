@@ -1,5 +1,5 @@
 ---
-title: spring事务基础认识和配置
+title: spring事务基础认识和配置讲解
 toc: true
 date: 2020-01-02 17:41:02
 tags: spring
@@ -8,6 +8,7 @@ thumbnail: /gallery/thumbnails/spring事务.jpg
 ---
 #### 注意：笔记只对作者有用，不能保证可靠性
 <!--more-->
+
 * 事务的特性：原子性、隔离性、持久性、一致性
 ***
 * Spring为不同的框架提供了不同PlatformTransactionManager接口（事务管理器）的实现类
@@ -27,7 +28,7 @@ thumbnail: /gallery/thumbnails/spring事务.jpg
     第四种：如果a事务存在，就挂起当前事务，创建一个新的事务，此时a和b不在一个事务内
 3、第三类（事务a后再事务b）：
     第七种：如果当前a事务存在，就使用嵌套事务
-***    
+***
 * TransactionStatus接口（事务状态）：获得或者判断事务的状态方法
 
 ***
@@ -47,6 +48,6 @@ thumbnail: /gallery/thumbnails/spring事务.jpg
 
 
 第二种配置后不用再业务层上增加代码，而第三种需要增加注解，看业务场景都可以使用
-***    
+***
 
-    
+​    
